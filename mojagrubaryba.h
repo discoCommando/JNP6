@@ -1,5 +1,5 @@
-#ifndef GRUBARYBA_H
-#define GRUBARYBA_H
+#ifndef MOJAGRUBARYBA_H
+#define MOJAGRUBARYBA_H
 
 #include<vector>
 #include<string>
@@ -16,6 +16,7 @@ class HumanPlayer;
 class MojaGrubaRyba //public GrubaRyba
 {
 public:
+	MojaGrubaRyba();
 private:
 	std::vector<std::shared_ptr<Player>> Players;
 	std::shared_ptr<Board> myBoard;
@@ -51,6 +52,11 @@ public:
 	// Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
 	// Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
 	virtual bool wantSell(std::string const& propertyName) = 0;
+	
+	int getPos();
+	
+private:
+	int position;
 };
 
 class Start: public Field
@@ -109,6 +115,30 @@ private:
 	int priceOfStay;
 };
 
+class HumanPlayer: public Player
+{
+public:
+	HumanPlayer(Human& h):
+		human(h){}
+		
+private:
+	Human& human;
+};
 
+class ComputerPlayer: public Player
+{
+public:
+	ComputerPlayer(GrubaRyba::ComputerLevel level):
+		myLevel(level){}
+	
+private:
+	GrubaRyba::ComputerLevel myLevel;
+
+};
+
+class ComputerStrategy
+{
+	
+};
 
 #endif
