@@ -3,6 +3,7 @@
 
 #include<vector>
 #include<string>
+#include<memory>
 #include"grubaryba.h"
 
 class Player;
@@ -14,10 +15,10 @@ class HumanPlayer;
 class MojaGrubaRyba //public GrubaRyba
 {
 private:
-	std::vector<Player> Players;
-	Board myBoard;
+	std::vector<std::shared_ptr<Player>> Players;
+	std::shared_ptr<Board> myBoard;
 	void makeRound();
-	void makeMove(Player p);
+	void makeMove(std::shared_ptr<Player> p);
 };
 
 class Board
@@ -29,9 +30,9 @@ class Field
 {
 public:
 	//puste funkcje (nic nie robią)
-	void stepOn(Player p);
-	void goThrough(Player p);
-	bool permissionToMove(Player p);
+	void stepOn(std::shared_ptr<Player> p);
+	void goThrough(std::shared_ptr<Player> p);
+	bool permissionToMove(std::shared_ptr<Player> p);
 };
 
 class Player
@@ -51,30 +52,30 @@ public:
 
 class Start: public Field
 {
-	void stepOn(Player p);
-	void goThrough(Player p);
+	void stepOn(std::shared_ptr<Player> p);
+	void goThrough(std::shared_ptr<Player> p);
 };
 class Reward: public Field
 {
-	void stepOn(Player p);
+	void stepOn(std::shared_ptr<Player> p);
 };
 class Punishment: public Field
 {
-	void stepOn(Player p);
+	void stepOn(std::shared_ptr<Player> p);
 };
 class Deposit: public Field
 {
-	void stepOn(Player p);
-	void goThrough(Player p);	
+	void stepOn(std::shared_ptr<Player> p);
+	void goThrough(std::shared_ptr<Player> p);	
 };
 class Aquarium: public Field
 {
-	void goThrough(Player p);
-	bool permissionToMove(Player p);
+	void goThrough(std::shared_ptr<Player> p);
+	bool permissionToMove(std::shared_ptr<Player> p);
 };
 class Property: public Field
 {
-	virtual void stepOn(Player p);
+	virtual void stepOn(std::shared_ptr<Player> p);
 };
 
 #endif
