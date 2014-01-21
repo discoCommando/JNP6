@@ -2,6 +2,7 @@
 #define GRUBARYBA_H
 
 #include<vector>
+#include<string>
 #include"grubaryba.h"
 
 class Player;
@@ -10,10 +11,10 @@ class Board;
 class ComputerPlayer;
 class HumanPlayer;
 
-class MojaGrubaRyba: public GrubaRyba
+class MojaGrubaRyba //public GrubaRyba
 {
 private:
-	Players: std::vector<player>;
+	std::vector<Player> Players;
 	Board myBoard;
 	void makeRound();
 	void makeMove(Player p);
@@ -21,15 +22,16 @@ private:
 
 class Board
 {
-	Fields: std::vector<Field>;
+	std::vector<Field> Fields;
 };
 
 class Field
 {
 public:
-	virtual void stepOn(Player p);
-	virtual void goThrough(Player p);
-	virtual bool permissionToMove(Player p);
+	//puste funkcje (nic nie robią)
+	void stepOn(Player p);
+	void goThrough(Player p);
+	bool permissionToMove(Player p);
 };
 
 class Player
@@ -45,6 +47,34 @@ public:
 	// Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
 	// Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
 	virtual bool wantSell(std::string const& propertyName) = 0;
+};
+
+class Start: public Field
+{
+	void stepOn(Player p);
+	void goThrough(Player p);
+};
+class Reward: public Field
+{
+	void stepOn(Player p);
+};
+class Punishment: public Field
+{
+	void stepOn(Player p);
+};
+class Deposit: public Field
+{
+	void stepOn(Player p);
+	void goThrough(Player p);	
+};
+class Aquarium: public Field
+{
+	void goThrough(Player p);
+	bool permissionToMove(Player p);
+};
+class Property: public Field
+{
+	virtual void stepOn(Player p);
 };
 
 #endif
