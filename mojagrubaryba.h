@@ -4,6 +4,7 @@
 #include<vector>
 #include<string>
 #include<memory>
+#include<map>
 #include"grubaryba.h"
 
 class Player;
@@ -14,6 +15,7 @@ class HumanPlayer;
 
 class MojaGrubaRyba //public GrubaRyba
 {
+public:
 private:
 	std::vector<std::shared_ptr<Player>> Players;
 	std::shared_ptr<Board> myBoard;
@@ -23,6 +25,7 @@ private:
 
 class Board
 {
+private:
 	std::vector<Field> Fields;
 };
 
@@ -52,30 +55,60 @@ public:
 
 class Start: public Field
 {
+	Start();
+public:
 	void stepOn(std::shared_ptr<Player> p);
 	void goThrough(std::shared_ptr<Player> p);
 };
+
 class Reward: public Field
 {
+public:
+	Reward(int price):
+		reward(price){}
 	void stepOn(std::shared_ptr<Player> p);
+private:
+	int reward;
 };
+
 class Punishment: public Field
 {
+public:
+	Punishment(int price):
+		punishmentPrice(price){}
 	void stepOn(std::shared_ptr<Player> p);
+private:
+	int punishmentPrice;
 };
 class Deposit: public Field
 {
+	Deposit():
+		cash(0){}
+public:
 	void stepOn(std::shared_ptr<Player> p);
-	void goThrough(std::shared_ptr<Player> p);	
+	void goThrough(std::shared_ptr<Player> p);
+private:
+	int cash;
 };
 class Aquarium: public Field
 {
-	void goThrough(std::shared_ptr<Player> p);
+public:
+	Aquarium(int wait):
+		waitTime(wait){}
 	bool permissionToMove(std::shared_ptr<Player> p);
+private:
+	int waitTime;
+	std::map<std::shared_ptr<Player>, int> waitingPlayers;
 };
 class Property: public Field
 {
+public:
 	virtual void stepOn(std::shared_ptr<Player> p);
+private:
+	std::shared_ptr<Player> Owner;
+	int priceOfStay;
 };
+
+
 
 #endif
