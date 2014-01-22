@@ -12,133 +12,160 @@ class Field;
 class Board;
 class ComputerPlayer;
 class HumanPlayer;
+class ComputerStrategy;
 
 class MojaGrubaRyba //public GrubaRyba
 {
 public:
-	MojaGrubaRyba();
+        MojaGrubaRyba();
 private:
-	std::vector<std::shared_ptr<Player>> Players;
-	std::shared_ptr<Board> myBoard;
-	void makeRound();
-	void makeMove(std::shared_ptr<Player> p);
+        std::vector<std::shared_ptr<Player>> Players;
+        std::shared_ptr<Board> myBoard;
+        void makeRound();
+        void makeMove(std::shared_ptr<Player> p);
 };
 
 class Board
 {
 private:
-	std::vector<Field> Fields;
+        std::vector<Field> Fields;
 };
 
 class Field
 {
 public:
-	//puste funkcje (nic nie robią)
-	void stepOn(std::shared_ptr<Player> p);
-	void goThrough(std::shared_ptr<Player> p);
-	bool permissionToMove(std::shared_ptr<Player> p);
+        //puste funkcje (nic nie robią)
+        void stepOn(std::shared_ptr<Player> p);
+        void goThrough(std::shared_ptr<Player> p);
+        bool permissionToMove(std::shared_ptr<Player> p);
 };
 
 class Player
 {
 public:
-	
-	// Zwraca imię człowieka.
-	virtual std::string const& getName() const = 0;
+        
+        // Zwraca imię człowieka.
+        virtual std::string const& getName() const = 0;
 
-	// Zwraca true, jeśli człowiek chce kupić daną posiadłość.
-	virtual bool wantBuy(std::string const& propertyName) = 0;
+        // Zwraca true, jeśli człowiek chce kupić daną posiadłość.
+        virtual bool wantBuy(std::string const& propertyName) = 0;
 
-	// Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
-	// Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
-	virtual bool wantSell(std::string const& propertyName) = 0;
-	
-	int getPos();
-	
+        // Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
+        // Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
+        virtual bool wantSell(std::string const& propertyName) = 0;
+        
+        int getPos();
+        
 private:
-	int position;
+        int position;
 };
 
 class Start: public Field
 {
-	Start();
+        Start();
 public:
-	void stepOn(std::shared_ptr<Player> p);
-	void goThrough(std::shared_ptr<Player> p);
+        void stepOn(std::shared_ptr<Player> p);
+        void goThrough(std::shared_ptr<Player> p);
 };
 
 class Reward: public Field
 {
 public:
-	Reward(int price):
-		reward(price){}
-	void stepOn(std::shared_ptr<Player> p);
+        Reward(int price):
+                reward(price){}
+        void stepOn(std::shared_ptr<Player> p);
 private:
-	int reward;
+        int reward;
 };
 
 class Punishment: public Field
 {
 public:
-	Punishment(int price):
-		punishmentPrice(price){}
-	void stepOn(std::shared_ptr<Player> p);
+        Punishment(int price):
+                punishmentPrice(price){}
+        void stepOn(std::shared_ptr<Player> p);
 private:
-	int punishmentPrice;
+        int punishmentPrice;
 };
 class Deposit: public Field
 {
-	Deposit():
-		cash(0){}
+        Deposit():
+                cash(0){}
 public:
-	void stepOn(std::shared_ptr<Player> p);
-	void goThrough(std::shared_ptr<Player> p);
+        void stepOn(std::shared_ptr<Player> p);
+        void goThrough(std::shared_ptr<Player> p);
 private:
-	int cash;
+        int cash;
 };
 class Aquarium: public Field
 {
 public:
-	Aquarium(int wait):
-		waitTime(wait){}
-	bool permissionToMove(std::shared_ptr<Player> p);
+        Aquarium(int wait):
+                waitTime(wait){}
+        bool permissionToMove(std::shared_ptr<Player> p);
 private:
-	int waitTime;
-	std::map<std::shared_ptr<Player>, int> waitingPlayers;
+        int waitTime;
+        std::map<std::shared_ptr<Player>, int> waitingPlayers;
 };
 class Property: public Field
 {
 public:
-	virtual void stepOn(std::shared_ptr<Player> p);
+        virtual void stepOn(std::shared_ptr<Player> p);
 private:
-	std::shared_ptr<Player> Owner;
-	int priceOfStay;
+        std::shared_ptr<Player> Owner;
+        int priceOfStay;
 };
 
 class HumanPlayer: public Player
 {
 public:
-	HumanPlayer(Human& h):
-		human(h){}
-		
+        HumanPlayer(Human& h) :
+                human(h){}
+                
 private:
-	Human& human;
+        Human& human;
 };
 
 class ComputerPlayer: public Player
 {
 public:
-	ComputerPlayer(GrubaRyba::ComputerLevel level):
-		myLevel(level){}
-	
+        ComputerPlayer(GrubaRyba::ComputerLevel level):
+                myLevel(level){}
+        
 private:
-	GrubaRyba::ComputerLevel myLevel;
+        
+        GrubaRyba::ComputerLevel myLevel;
+        std::shared_ptr<ComputerStrategy> strategy;
 
 };
 
-class ComputerStrategy
-{
-	
+// Strategia decyzji kup/ sprzedaj;
+class ComputerStrategy {
+        public:
+                //TODO ASK: virtualny destruktor??
+                virtual ~ComputerStrategy(){};
+
+                virtual bool wantBuy() = 0;
+                virtual bool wantSell() = 0;
+};
+
+class DumbComputerStrategy : public ComputerStrategy {
+
+        private :
+                int buyOfferCount;
+                int sellOfferCount;
+        public :
+                DumbComputerStrategy();
+                bool wantBuy(); 
+                bool wantSell();
+};
+
+class SmartassComputerStrategy : public ComputerStrategy {
+
+        public :
+                SmartassComputerStrategy();
+                bool wantBuy(); 
+                bool wantSell();
 };
 
 #endif
