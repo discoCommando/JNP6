@@ -27,19 +27,15 @@ private:
 
 class Board
 {
-private:
-        std::vector<Field> Fields;
+protected:
+        std::vector<std::shared_ptr<Field>> Fields;
 };
 
-class Field
+class MGRBoard
 {
 public:
-        //puste funkcje (nic nie robią)
-        void stepOn(std::shared_ptr<Player> p);
-        void goThrough(std::shared_ptr<Player> p);
-        bool permissionToMove(std::shared_ptr<Player> p);
+		MGRBoard();
 };
-
 class Player
 {
 public:
@@ -59,11 +55,28 @@ public:
 private:
         int position;
 };
+class Field
+{
+public:
+        //puste funkcje (nic nie robią)
+        Field(const std::string& _name):
+				name(_name){}
+        void stepOn(std::shared_ptr<Player> p);
+        void goThrough(std::shared_ptr<Player> p);
+        bool permissionToMove(std::shared_ptr<Player> p);
+		const std::string& getName();
+		
+protected:
+		const std::string name;
+};
+
+
 
 class Start: public Field
 {
-        Start();
 public:
+        Start(const std::string& _name):
+				Field(_name){}
         void stepOn(std::shared_ptr<Player> p);
         void goThrough(std::shared_ptr<Player> p);
 };
@@ -71,8 +84,9 @@ public:
 class Reward: public Field
 {
 public:
-        Reward(int price):
-                reward(price){}
+        Reward(int price,const std::string& _name):
+				Field(_name),
+				reward(price){}
         void stepOn(std::shared_ptr<Player> p);
 private:
         int reward;
@@ -81,15 +95,17 @@ private:
 class Punishment: public Field
 {
 public:
-        Punishment(int price):
+        Punishment(const std::string& _name, int price):
+				Field(_name),
                 punishmentPrice(price){}
         void stepOn(std::shared_ptr<Player> p);
-private:
+protected:
         int punishmentPrice;
 };
 class Deposit: public Field
 {
-        Deposit():
+        Deposit(const std::string& _name):
+				Field(name),
                 cash(0){}
 public:
         void stepOn(std::shared_ptr<Player> p);
@@ -100,7 +116,8 @@ private:
 class Aquarium: public Field
 {
 public:
-        Aquarium(int wait):
+        Aquarium(const std::string& _name, int wait):
+				Field(name),
                 waitTime(wait){}
         bool permissionToMove(std::shared_ptr<Player> p);
 private:
@@ -110,10 +127,15 @@ private:
 class Property: public Field
 {
 public:
+		Property(const std::string& _name, int _price, int _priceOfStay):
+		Field(_name),
+		price(_price),
+		priceOfStay(_priceOfStay){}
         virtual void stepOn(std::shared_ptr<Player> p);
-private:
+protected:
         std::shared_ptr<Player> Owner;
-        int priceOfStay;
+		int price;
+		int priceOfStay;
 };
 
 class HumanPlayer: public Player
@@ -166,6 +188,28 @@ class SmartassComputerStrategy : public ComputerStrategy {
                 SmartassComputerStrategy();
                 bool wantBuy(); 
                 bool wantSell();
+};
+
+class Coral: public Property
+{
+public:
+		Coral(int _price, const std::string& _name):
+				Property(_name, _price,_price*percentOfStay/100)
+				{}
+			
+private:
+		const int percentOfStay = 20;
+};
+
+class PublicProperty: public Property
+{
+public:
+		PublicProperty(int _price, const std::string& _name):
+				Property(_name, _price, _price*percentOfStay/100){};
+		
+private:
+		const int percentOfStay = 40;
+	
 };
 
 #endif
