@@ -117,4 +117,9 @@ void Aquarium::endOfRound()
 	}
 }
 
+void Property::stepOn(std::shared_ptr< Player > p)
+{
+	//TODO WYJATKIIIII
+	this->Owner->takeCash(p->giveCash());
+}
 

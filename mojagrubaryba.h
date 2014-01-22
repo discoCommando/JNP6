@@ -38,6 +38,7 @@ private:
         std::shared_ptr<Board> myBoard;
         void makeRound();
         void makeMove(std::shared_ptr<Player> p);
+	void bankruptPlayer(std::shared_ptr<Player> p);
 };
 
 class Board
@@ -157,11 +158,11 @@ private:
 class Property: public Field
 {
 public:
-		Property(const std::string& _name, int _price, int _priceOfStay):
+	Property(const std::string& _name, int _price, int _priceOfStay):
 		Field(_name),
 		price(_price),
 		priceOfStay(_priceOfStay){}
-        virtual void stepOn(std::shared_ptr<Player> p);
+        void stepOn(std::shared_ptr<Player> p);
 protected:
         std::shared_ptr<Player> Owner;
 		int price;
