@@ -42,3 +42,79 @@ MGRBoard::MGRBoard()
 	Board::addField( std::shared_ptr<Field>(new Punishment("Rekin", priceOfPayRekin)));
 	
 }
+
+
+void Field::stepOn(std::shared_ptr<Player> p){}
+void Field::goThrough(std::shared_ptr<Player> p){}
+bool Field::permissionToMove(std::shared_ptr<Player> p)
+{
+	return true;
+}
+void Field::endOfRound()
+{
+
+}
+const std::string& Field::getName()
+{
+	return this->name;
+}
+
+
+
+void Start::stepOn(std::shared_ptr<Player> p)
+{
+	p->giveCash(startPrice);
+}
+void Start::goThrough(std::shared_ptr<Player> p)
+{
+	Start::stepOn(p);
+}
+
+
+void Reward::stepOn(std::shared_ptr< Player > p)
+{
+	p->giveCash(this->reward);
+}
+
+
+void Punishment::stepOn(std::shared_ptr< Player > p)
+{
+	//TODO rzucic wyjatek jesli p->takeCash(this->punishmentPrice) < punishmentPrice (to znaczy ze zbankrutowal)
+	p->takeCash(this->punishmentPrice);
+}
+
+
+void Deposit::goThrough(std::shared_ptr< Player > p)
+{
+	//TODO to samo co wyzej
+	cash += p->giveCash(this->payPrice);
+}
+void Deposit::stepOn(std::shared_ptr< Player > p)
+{
+	p->giveCash(this->cash);
+	cash = 0;
+}
+
+void Aquarium::stepOn(std::shared_ptr< Player > p)
+{
+	this->waitingPlayers[p] = this->waitTime;
+}
+bool Aquarium::permissionToMove(std::shared_ptr< Player > p)
+{
+	auto it = waitingPlayers.find(p);
+	if (it->second == 0)
+	{
+		waitingPlayers.erase(it);
+		return true;
+	}
+	return false;
+}
+void Aquarium::endOfRound()
+{
+	for(auto it = waitingPlayers.begin(); it != waitingPlayers.end(); it++)
+	{
+		it->second--;
+	}
+}
+
+

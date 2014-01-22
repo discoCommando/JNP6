@@ -20,6 +20,7 @@ const int priceOfPayLaguna = 15;
 const int priceOfPayRekin = 180;
 const int rewardBlazenki = 120;
 
+const int startPrice = 50;
 
 class Player;
 class Field;
@@ -70,9 +71,12 @@ public:
         virtual bool wantSell(std::string const& propertyName) = 0;
         
         int getPos();
+	void takeCash(int _cash);
+	int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
         
 private:
         int position;
+	int cash;
 };
 class Field
 {
@@ -83,10 +87,11 @@ public:
         void stepOn(std::shared_ptr<Player> p);
         void goThrough(std::shared_ptr<Player> p);
         bool permissionToMove(std::shared_ptr<Player> p);
-		const std::string& getName();
+	void endOfRound();
+	const std::string& getName();
 		
 protected:
-		const std::string name;
+	const std::string name;
 };
 
 
@@ -141,7 +146,10 @@ public:
         Aquarium(const std::string& _name, int wait):
 				Field(name),
                 waitTime(wait){}
+	
+	void stepOn(std::shared_ptr<Player> p);
         bool permissionToMove(std::shared_ptr<Player> p);
+	void endOfRound();
 private:
         int waitTime;
         std::map<std::shared_ptr<Player>, int> waitingPlayers;
