@@ -120,6 +120,41 @@ void Aquarium::endOfRound()
 void Property::stepOn(std::shared_ptr< Player > p)
 {
 	//TODO WYJATKIIIII
-	this->Owner->takeCash(p->giveCash());
+	this->Owner->takeCash(p->giveCash(this->priceOfStay));
 }
+
+bool Property::noOwner()
+{
+	if (this->Owner)
+		return true;
+	return false;
+}
+
+
+int Player::getPos()
+{
+	return this->position;
+}
+
+void Player::takeCash(int _cash)
+{
+	this->cash += _cash;
+}
+
+int Player::getCash()
+{
+	return this->cash;
+}
+
+int Player::giveCash(int _cash)
+{
+	auto it = this->myProperties.begin();
+// 	while ((this->cash < _cash) && (it != this->myProperties.end()))
+// 	{
+// 		if(this->wantSell(it.))
+// 	}
+}
+
+
+
 

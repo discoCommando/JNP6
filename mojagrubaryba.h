@@ -57,28 +57,7 @@ class MGRBoard: public Board
 public:
 	MGRBoard();
 };
-class Player
-{
-public:
-        
-        // Zwraca imię człowieka.
-        virtual std::string const& getName() const = 0;
 
-        // Zwraca true, jeśli człowiek chce kupić daną posiadłość.
-        virtual bool wantBuy(std::string const& propertyName) = 0;
-
-        // Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
-        // Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
-        virtual bool wantSell(std::string const& propertyName) = 0;
-        
-        int getPos();
-	void takeCash(int _cash);
-	int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
-        
-private:
-        int position;
-	int cash;
-};
 class Field
 {
 public:
@@ -155,6 +134,7 @@ private:
         int waitTime;
         std::map<std::shared_ptr<Player>, int> waitingPlayers;
 };
+
 class Property: public Field
 {
 public:
@@ -163,10 +143,61 @@ public:
 		price(_price),
 		priceOfStay(_priceOfStay){}
         void stepOn(std::shared_ptr<Player> p);
+	bool noOwner();
+
 protected:
         std::shared_ptr<Player> Owner;
-		int price;
-		int priceOfStay;
+	int price;
+	int priceOfStay;
+};
+
+
+
+class Coral: public Property
+{
+public:
+		Coral(const std::string& _name, int _price):
+				Property(_name, _price,_price*percentOfStay/100)
+				{}
+			
+private:
+		const int percentOfStay = 20;
+};
+
+class PublicProperty: public Property
+{
+public:
+		PublicProperty(const std::string& _name, int _price):
+				Property(_name, _price, _price*percentOfStay/100){};
+		
+private:
+		const int percentOfStay = 40;
+	
+};
+
+class Player
+{
+public:
+        
+        // Zwraca imię człowieka.
+        virtual std::string const& getName() const = 0;
+
+        // Zwraca true, jeśli człowiek chce kupić daną posiadłość.
+        virtual bool wantBuy(std::string const& propertyName) = 0;
+
+        // Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
+        // Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
+        virtual bool wantSell(std::string const& propertyName) = 0;
+        
+        int getPos();
+	void takeCash(int _cash);
+	int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
+	int getCash();
+        
+private:
+        int position;
+	int cash;
+	std::vector<std::shared_ptr<Property>> myProperties;
 };
 
 class HumanPlayer: public Player
@@ -220,27 +251,4 @@ class SmartassComputerStrategy : public ComputerStrategy {
                 bool wantBuy(); 
                 bool wantSell();
 };
-
-class Coral: public Property
-{
-public:
-		Coral(const std::string& _name, int _price):
-				Property(_name, _price,_price*percentOfStay/100)
-				{}
-			
-private:
-		const int percentOfStay = 20;
-};
-
-class PublicProperty: public Property
-{
-public:
-		PublicProperty(const std::string& _name, int _price):
-				Property(_name, _price, _price*percentOfStay/100){};
-		
-private:
-		const int percentOfStay = 40;
-	
-};
-
 #endif
