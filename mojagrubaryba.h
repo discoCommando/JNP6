@@ -12,6 +12,7 @@ class Field;
 class Board;
 class ComputerPlayer;
 class HumanPlayer;
+class ComputerStrategy;
 
 class MojaGrubaRyba //public GrubaRyba
 {
@@ -118,7 +119,7 @@ private:
 class HumanPlayer: public Player
 {
 public:
-	HumanPlayer(Human& h):
+	HumanPlayer(Human& h) :
 		human(h){}
 		
 private:
@@ -132,13 +133,39 @@ public:
 		myLevel(level){}
 	
 private:
+	
 	GrubaRyba::ComputerLevel myLevel;
+	std::shared_ptr<ComputerStrategy> strategy;
 
 };
 
-class ComputerStrategy
-{
-	
+// Strategia decyzji kup/ sprzedaj;
+class ComputerStrategy {
+	public:
+		//TODO ASK: virtualny destruktor??
+		virtual ~ComputerStrategy(){};
+
+		virtual bool wantBuy() = 0;
+		virtual bool wantSell() = 0;
+};
+
+class DumbComputerStrategy : public ComputerStrategy {
+
+	private :
+		int buyOfferCount;
+		int sellOfferCount;
+	public :
+		DumbComputerStrategy();
+		bool wantBuy(); 
+		bool wantSell();
+};
+
+class SmartassComputerStrategy : public ComputerStrategy {
+
+	public :
+		SmartassComputerStrategy();
+		bool wantBuy(); 
+		bool wantSell();
 };
 
 #endif

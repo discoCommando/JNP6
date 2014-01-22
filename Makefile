@@ -1,2 +1,2 @@
 all:
-	g++ mojagrubaryba.h -c -o dupa.o -Wall -std=c++11
+	g++ mojagrubaryba.h -c -Wall -std=c++11
