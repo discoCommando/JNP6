@@ -7,6 +7,20 @@
 #include<map>
 #include"grubaryba.h"
 
+
+const int priceOfAnemonia = 160;
+const int priceOfAporina = 220;
+const int priceOfGrota = 300;
+const int priceOfMenella = 280;
+const int priceOfStatek = 250;
+const int priceOfPennatula = 400;
+
+const int aquaWait = 3;
+const int priceOfPayLaguna = 15;
+const int priceOfPayRekin = 180;
+const int rewardBlazenki = 120;
+
+
 class Player;
 class Field;
 class Board;
@@ -27,14 +41,19 @@ private:
 
 class Board
 {
+
+public:
+	Board(){}
+	void addField(std::shared_ptr<Field> newField);
+	int sizeOfBoard() const;
 protected:
         std::vector<std::shared_ptr<Field>> Fields;
 };
 
-class MGRBoard
+class MGRBoard: public Board
 {
 public:
-		MGRBoard();
+	MGRBoard();
 };
 class Player
 {
@@ -84,9 +103,9 @@ public:
 class Reward: public Field
 {
 public:
-        Reward(int price,const std::string& _name):
-				Field(_name),
-				reward(price){}
+        Reward(const std::string& _name, int price):
+		Field(_name),
+		reward(price){}
         void stepOn(std::shared_ptr<Player> p);
 private:
         int reward;
@@ -96,7 +115,7 @@ class Punishment: public Field
 {
 public:
         Punishment(const std::string& _name, int price):
-				Field(_name),
+		Field(_name),
                 punishmentPrice(price){}
         void stepOn(std::shared_ptr<Player> p);
 protected:
@@ -104,14 +123,17 @@ protected:
 };
 class Deposit: public Field
 {
-        Deposit(const std::string& _name):
-				Field(name),
-                cash(0){}
+        
 public:
+	Deposit(const std::string& _name, int _payPrice):
+		Field(name),
+                cash(0),
+                payPrice(_payPrice){}
         void stepOn(std::shared_ptr<Player> p);
         void goThrough(std::shared_ptr<Player> p);
 private:
         int cash;
+	int payPrice;
 };
 class Aquarium: public Field
 {
@@ -193,7 +215,7 @@ class SmartassComputerStrategy : public ComputerStrategy {
 class Coral: public Property
 {
 public:
-		Coral(int _price, const std::string& _name):
+		Coral(const std::string& _name, int _price):
 				Property(_name, _price,_price*percentOfStay/100)
 				{}
 			
@@ -204,7 +226,7 @@ private:
 class PublicProperty: public Property
 {
 public:
-		PublicProperty(int _price, const std::string& _name):
+		PublicProperty(const std::string& _name, int _price):
 				Property(_name, _price, _price*percentOfStay/100){};
 		
 private:
