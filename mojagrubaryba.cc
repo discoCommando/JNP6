@@ -130,7 +130,7 @@ bool Property::noOwner()
 	return false;
 }
 
-
+//PLAYER
 int Player::getPos()
 {
 	return this->position;
@@ -155,25 +155,70 @@ int Player::giveCash(int _cash)
 // 	}
 }
 
-shared_ptr<HumanPlayer> HumanPlayer::create(){
-	//TODO sprawdzic domyslny konstruktor;
-	return shared_ptr<HumanPlayer>(new HumanPlayer());
+//HUMAN PLAYER; //FIXME
+HumanPlayer::HumanPlayer(Human _h) : h(_h), position(0), cash(1000), myProperties()  {};
+
+shared_ptr<HumanPlayer> HumanPlayer::create(Human _h){
+	return shared_ptr<Human>(_h);
+}
+//teraz glupie funkcje;
+
+std::string const& HumanPlayer::getName(){
+	return h->getName();
+}
+
+bool HumanPlayer::wantBuy(std::string const& propertyName){
+	return h->wantBuy(propertyName);
+}
+
+bool HumanPlayer::wantSell(std::string const& propertyName){
+	return h->wantSell(propertyName);
 }
 
 shared_ptr<HumanPlayer> HumanPlayer::clone(){
-	//TODO sprawdzic kopjujacy konstruktor;
-	return shared_ptr<HumanPlayer>(new HumanPlayer(*this));
+	return HumanPlayer(*this);
 }
 
-shared_ptr<ComputerPlayer> ComputerPlayer::create(){
-	return shared_ptr<ComputerPlayer>(new ComputerPlayer());
+
+//COMPUTER PLAYER; //FIXME ZROBIC TO DOBRZE;
+ComputerPlayer::ComputerPlayer(std::string _name) : name(_name), position(0), cash(1000), myProperties() {};
+
+shared_ptr<ComputerPlayer> ComputerPlayer::create(std::string _name){
+	return shared_ptr<ComputerPlayer>(new ComputerPlayer(_name));
 }
 
-shared_ptr<ComputerPlayer> ComputerPlayer::clone(){
-	return shared_ptr<ComputerPlayer>(new ComputerPlayer(*this));
+std::string const& ComputerPlayer::getName(){
+	return name;
 }
 
-//Implementacja Factory;
+//DUMBCOMPUTERPLAYER;
+DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){};
+
+shared_ptr<DumbComputerPlayer> DumbComputerPlayer::create(std::string _name){
+	return shared_ptr<DumbComputerPlayer>(new DumbComputerPlayer(_name));
+}
+//FIXME sprawdzic czy pierwsze kupuje;
+bool DumbComputerPlayer::wantBuy(std::string const& propertyName){
+	return (++buyOffers%3 == 0);
+}
+bool DumbComputerPlayer::wantSell(std::string const& propertyName){
+	return false;
+}
+
+//SMARTASSCOMPUTERPLAYER
+SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){};
+
+shared_ptr<SmartassComputerPlayer> SmartassComputerPlayer::crete(std::string _name){
+	return shared_ptr<SmartassComputerPlayer>(new SmartassComputerPlayer(_name));
+}
+bool SmartassComputerPlayer::wantBuy(std::string const& propertyName){
+	return true;
+}
+bool SmartassComputerPlayer::wantSell(std::string const& propertyName){
+	return false;
+}
+
+//FACTORY;
 void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, ComputerPlayer p ){
 	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, ComputerPlayer>(l,p);
 }

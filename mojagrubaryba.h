@@ -24,12 +24,15 @@ const int rewardBlazenki = 120;
 
 const int startPrice = 50;
 
+
 class Player;
 class Field;
 class Board;
+
 class ComputerPlayer;
 class HumanPlayer;
-class ComputerStrategy;
+class HumanPlayerPrototype;
+class PlayerFactory;
 
 class MojaGrubaRyba //public GrubaRyba
 {
@@ -43,7 +46,7 @@ private:
         std::shared_ptr<Board> myBoard;
 
 	std::shared_ptr<PlayerFactory> factory;
-	std::shared_ptr<Player> humanPlayerPrototype;
+	std::shared_ptr<HumanPlayer> humanPlayerPrototype;
 
         void makeRound();
         void makeMove(std::shared_ptr<Player> p);
@@ -187,10 +190,6 @@ private:
 
 //======================================================================================= 
 //TO CO NOWE TO PONIZEJ.
-//
-//
-
-
 
 //Klasa Player Jest Klasą Bazowa dla ComputerPlayer oraz dla HumanPlayer.
 //TODO: zastanowic sie czy klasa nie powinna czegos implementowac
@@ -198,6 +197,8 @@ private:
 class Player{
 public:
         
+	Player(int _position = 0, int cash = 1000);
+	virtual ~Player() = 0;
         // Zwraca imię człowieka.
         virtual std::string const& getName() const = 0;
 
@@ -213,21 +214,16 @@ public:
 	virtual void takeCash(int _cash) = 0;
 	virtual int giveCash(int _cash) = 0; //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
 	
-	//TODO Zastanowic sie raz jeszcze nad tymi metodami, ale na 99% nie.
-	//ich implementacja znajdzie sie w graczu.
-	//virtual shared_ptr<Player> clone() const = 0;
-	//virtual shared_ptr<Player> create() const = 0;
-	//virtual ~Player() = 0;
 
 	//TODO zastanowic sie czy klasa nie powinna czegos implementowac.
 	//int getCash();
-//private:
+private:
 	//std::string name;
 	//int number;
 
-        //int position;
-	//int cash;
-	//std::vector<std::shared_ptr<Property>> myProperties;
+        int position;
+	int cash;
+	std::vector<std::shared_ptr<Property>> myProperties;
 };
 
 //class HumanPlayerPrototype, to Prototyp -- pomoze latwo zmienic implementacje klasy Human;
@@ -235,7 +231,7 @@ public:
 //Przekazujemy obiket nowoutowrzonej klasy w parametrze konstruktora MojejGrubejRyby;
 // UWAGA : implementacja addHumanPlayer(h) uzywa czegos takiego: prototype.create(h);
 class HumanPlayerPrototype{
-	virtual shared_ptr<HumanPlayerPrototype> create(Human _h) ;
+	virtual std::shared_ptr<HumanPlayerPrototype> create(std::shared_ptr<Human> _h) = 0;
 	//virtual shared_ptr<HumanPlayerPrototype> clone();
 };
 
@@ -243,14 +239,10 @@ class HumanPlayerPrototype{
 // umie odpowiadac na komunkaty klasy MojaGrubaRyba korzystajac z klasy Human;
 class HumanPlayer: public Player, public HumanPlayerPrototype{
 public:
-        HumanPlayer(std::shared_ptr<Human> _h); //: human(h){};
-	shared_ptr<HumanPlayer> create(std::shared_ptr<Human> _h);
+        HumanPlayer ( std::shared_ptr<Human> _h ); //: human(h){};
+	std::shared_ptr<HumanPlayer> create( std::shared_ptr<Human> _h);
 private:
 	std::shared_ptr<Human> h;
-	
-	int position;
-	int cash;
-	std::vector<std::shared_ptr<Property> > myProperties;
 };
 
 class ComputerPlayer: public Player{
@@ -259,29 +251,47 @@ public:
         //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
 	
 	
-	virtual shared_ptr<Player> create(std::string name);
+	virtual std::shared_ptr<ComputerPlayer> create(std::string _name);
 	//shared_ptr<ComputerPlayer> clone();
 private:
 	std::string name;
-	int position;
-	int cash;
-	std::vector<std::shared_ptr<Property> > myProperties;
-
-        //GrubaRyba::ComputerLevel myLevel;
+	//GrubaRyba::ComputerLevel myLevel;
 };
 
+class DumbComputerPlayer : public ComputerPlayer {
+
+	private :
+		int buyOffers;
+		int selOffers;
+	public:
+		DumbComputerPlayer(std::string _name);
+		std::shared_ptr<DumbComputerPlayer> create (std::string _name);
+		bool wantBuy(std::string const& propertyName);
+		bool wantSell(std::string const& propertyName);
+};
+
+class SmartassComputerPlayer : public ComputerPlayer {
+
+	public:
+		SmartassComputerPlayer(std::string _name);
+		std::shared_ptr<DumbComputerPlayer> create (std::string _name);
+		bool wantBuy(std::string const& propertyName);
+		bool wantSell(std::string const& propertyName);
+};
+
+//FACTORY
 class PlayerFactory {
 	public:
-		virtual void registerComputerPlayer( ComputerLvl lvl, shared_ptr<ComputerPlayer> prototype ) = 0;
-		virtual shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
+		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
+		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
 };
 
 class ConcretePlayerFactory : public PlayerFactory{
 	private:
 		std::map<typename GrubaRyba::ComputerLevel, ComputerPlayer> computerPlayerMap;
 	public:
-		void registerComputerPlayer( ComputerLvl lvl, shared_ptr<ComputerPlayer> prototype);
-		shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
+		void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype);
+		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
 };
 
 
