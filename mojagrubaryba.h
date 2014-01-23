@@ -48,7 +48,7 @@ class EndOfGameException: public std::exception
 };
 
 
-class MojaGrubaRyba //public GrubaRyba
+class MojaGrubaRyba : public GrubaRyba
 {
 friend class MGRBoard;
 
