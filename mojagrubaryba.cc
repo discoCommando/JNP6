@@ -395,8 +395,12 @@ ConcretePlayerFactory::ConcretePlayerFactory(){}
 
 void MojaGrubaRyba::addComputerPlayer(GrubaRyba::ComputerLevel level)
 {
+<<<<<<< HEAD
 	
 	Players.push_back(factory->createComputerPlayer(level, "gracz"+ std::to_string(Players.size())));
+=======
+	Players.push_back(factory->createComputerPlayer(level, "gracz"+std::to_string(Players.size())));
+>>>>>>> 5bf9d4b9bc7e669a6106fd18a1c247a114da3c54
 
 }
 void MojaGrubaRyba::addHumanPlayer(std::shared_ptr< Human > human)
