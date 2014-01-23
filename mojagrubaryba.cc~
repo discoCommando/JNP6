@@ -170,7 +170,8 @@ void Punishment::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptExcepti
 void Deposit::goThrough(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO to samo co wyzej
-        auto pair = p->giveCash(this->payPrice);
+        int cashGiven = 0;
+		auto pair = p->giveCash(this->payPrice);
         
 		if(pair.second) throw PlayerBankruptException();
 }
@@ -205,7 +206,8 @@ void Aquarium::endOfRound()
 void Property::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO WYJATKIIIII
-        auto pair =  p->giveCash(this->priceOfStay);
+        int cashGiven = 0;
+		auto pair =  p->giveCash(this->priceOfStay);
         this->Owner->takeCash(pair.first);
 		if(pair.second) throw PlayerBankruptException();
 }
@@ -217,7 +219,6 @@ bool Property::noOwner()
         return false;
 }
 
-//PLAYER
 void Property::getSold()
 {
 		this->Owner.reset();
@@ -225,7 +226,6 @@ void Property::getSold()
 
 
 
->>>>>>> 6953560272eac62509d6f1ce14953155bd1d1156
 int Player::getPos()
 {
         return this->position;
@@ -270,77 +270,4 @@ std::pair<int, bool> Player::giveCash(int _cash)
 		}
 		cash = cash >= _cash? _cash: cash;
 		return std::make_pair(cash, bankrupt);
-}
-
-//HUMAN PLAYER; //FIXME
-HumanPlayer::HumanPlayer(Human _h) : h(_h), position(0), cash(1000), myProperties()  {};
-
-shared_ptr<HumanPlayer> HumanPlayer::create(Human _h){
-	return shared_ptr<Human>(_h);
-}
-//teraz glupie funkcje;
-
-std::string const& HumanPlayer::getName(){
-	return h->getName();
-}
-
-bool HumanPlayer::wantBuy(std::string const& propertyName){
-	return h->wantBuy(propertyName);
-}
-
-bool HumanPlayer::wantSell(std::string const& propertyName){
-	return h->wantSell(propertyName);
-}
-
-shared_ptr<HumanPlayer> HumanPlayer::clone(){
-	return HumanPlayer(*this);
-}
-
-
-//COMPUTER PLAYER; //FIXME ZROBIC TO DOBRZE;
-ComputerPlayer::ComputerPlayer(std::string _name) : name(_name), position(0), cash(1000), myProperties() {};
-
-shared_ptr<ComputerPlayer> ComputerPlayer::create(std::string _name){
-	return shared_ptr<ComputerPlayer>(new ComputerPlayer(_name));
-}
-
-std::string const& ComputerPlayer::getName(){
-	return name;
-}
-
-//DUMBCOMPUTERPLAYER;
-DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){};
-
-shared_ptr<ComputerPlayer> DumbComputerPlayer::create(std::string _name){
-	return shared_ptr<ComputerPlayer>(new DumbComputerPlayer(_name));
-}
-//FIXME sprawdzic czy pierwsze kupuje;
-bool DumbComputerPlayer::wantBuy(std::string const& propertyName){
-	return (++buyOffers%3 == 0);
-}
-bool DumbComputerPlayer::wantSell(std::string const& propertyName){
-	return false;
-}
-
-//SMARTASSCOMPUTERPLAYER
-SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){};
-
-shared_ptr<ComputerPlayer> SmartassComputerPlayer::crete(std::string _name){
-	return shared_ptr<ComputerPlayer>(new SmartassComputerPlayer(_name));
-}
-bool SmartassComputerPlayer::wantBuy(std::string const& propertyName){
-	return true;
-}
-bool SmartassComputerPlayer::wantSell(std::string const& propertyName){
-	return false;
-}
-
-//FACTORY;
-void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, shared_ptr<ComputerPlayer> p ){
-	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, std::shared_ptr<ComputerPlayer> >(l,p);
-}
-
-std::shared_ptr<ComputerPlayer> ConcreteComputerPlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel id, std::string _name){
-	//return computerPlayerMap.at(id).clone();
-	return shared_ptr<ComputerPlayer>(computerPlayerMap.at(id).create(_name);
 }

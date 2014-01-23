@@ -6,12 +6,9 @@
 #include<memory>
 #include<map>
 #include<exception>
-#include<tuple>
 #include"grubaryba.h"
 
-typedef GrubaRyba::ComputerLevel ComputerLvl;
 
-//TODO UKRYC STALE W KONSTRUKTORACH
 const int priceOfAnemonia = 160;
 const int priceOfAporina = 220;
 const int priceOfGrota = 300;
@@ -26,15 +23,12 @@ const int rewardBlazenki = 120;
 
 const int startPrice = 50;
 
-
 class Player;
 class Field;
 class Board;
-
 class ComputerPlayer;
 class HumanPlayer;
-class HumanPlayerPrototype;
-class PlayerFactory;
+class ComputerStrategy;
 class MGRBoard;
 
 class PlayerBankruptException: public std::exception
@@ -53,9 +47,6 @@ class MojaGrubaRyba //public GrubaRyba
 friend class MGRBoard;
 
 public:
-        MojaGrubaRyba();
-	MojaGrubaRyba(std::shared_ptr<PlayerFactory> _factory, std::shared_ptr<HumanPlayerPrototype> _humanPlayerPrototype);
-	//TODO zmienic powyzszy konstruktor zeby bral w argumencie liczbe graczy;
 		
         MojaGrubaRyba(); virtual void setDie(std::shared_ptr<Die> die) = 0;
 
@@ -63,19 +54,13 @@ public:
 		void addHumanPlayer(std::shared_ptr<Human> human);
 		void play(unsigned int rounds);
 private:
-
         std::vector<std::shared_ptr<Player>> Players;
-
-	std::shared_ptr<PlayerFactory> factory;
-	std::shared_ptr<HumanPlayer> humanPlayerPrototype;
-
         std::shared_ptr<MGRBoard> myBoard;
         void makeRound() throw (EndOfGameException);
         void makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         void bankruptPlayer(std::shared_ptr<Player> p);
 		std::shared_ptr<Die> defaultDie;
 };
-
 
 class Board
 {
@@ -214,17 +199,10 @@ private:
         
 };
 
-//======================================================================================= 
-//TO CO NOWE TO PONIZEJ.
-
-//Klasa Player Jest Klasą Bazowa dla ComputerPlayer oraz dla HumanPlayer.
-//TODO: zastanowic sie czy klasa nie powinna czegos implementowac
-
-class Player{
+class Player
+{
 public:
         
-	Player(int _position = 0, int cash = 1000);
-	virtual ~Player() = 0;
         // Zwraca imię człowieka.
         virtual std::string const& getName() const = 0;
 
@@ -234,7 +212,6 @@ public:
         // Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
         // Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
         virtual bool wantSell(std::string const& propertyName) = 0;
-
         
         int getPos();
         void takeCash(int _cash);
@@ -248,75 +225,54 @@ protected:
         std::vector<std::shared_ptr<Property>> myProperties;
 };
 
-//class HumanPlayerPrototype, to Prototyp -- pomoze latwo zmienic implementacje klasy Human;
-//Zmiana Human --> piszemy class NewHumanPlayer: public Player, public HumanPlayerPrototype{...}
-//Przekazujemy obiket nowoutowrzonej klasy w parametrze konstruktora MojejGrubejRyby;
-// UWAGA : implementacja addHumanPlayer(h) uzywa czegos takiego: prototype.create(h);
-class HumanPlayerPrototype{
-	virtual std::shared_ptr<HumanPlayer> create(std::shared_ptr<Human> _h) = 0;
-	//virtual shared_ptr<HumanPlayerPrototype> clone();
-};
-
-// klasa HumanPlayer jest ADAPTEREM.
-// umie odpowiadac na komunkaty klasy MojaGrubaRyba korzystajac z klasy Human;
-class HumanPlayer: public Player, public HumanPlayerPrototype{
+class HumanPlayer: public Player
+{
 public:
-        HumanPlayer ( std::shared_ptr<Human> _h ); //: human(h){};
-	std::shared_ptr<HumanPlayer> create( std::shared_ptr<Human> _h);
+        HumanPlayer(Human& h) :
+                human(h){}
+                
 private:
-	std::shared_ptr<Human> h;
+        Human& human;
 };
 
-class ComputerPlayer: public Player{
+class ComputerPlayer: public Player
+{
 public:
-	//TODO rostrzygnac czy potrzebne.
-        //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
-	
-	
-	virtual std::shared_ptr<ComputerPlayer> create(std::string _name);
-	//shared_ptr<ComputerPlayer> clone();
-private:
-	std::string name;
-	//GrubaRyba::ComputerLevel myLevel;
+        ComputerPlayer(GrubaRyba::ComputerLevel level):
+                myLevel(level){}private:
+        
+        GrubaRyba::ComputerLevel myLevel;
+        std::shared_ptr<ComputerStrategy> strategy;
+
 };
 
-class DumbComputerPlayer : public ComputerPlayer {
+// Strategia decyzji kup/ sprzedaj;
+class ComputerStrategy {
+        public:
+                //TODO ASK: virtualny destruktor??
+                virtual ~ComputerStrategy(){};
 
-	private :
-		int buyOffers;
-		int selOffers;
-	public:
-		DumbComputerPlayer(std::string _name);
-		std::shared_ptr<ComputerPlayer> create (std::string _name);
-		bool wantBuy(std::string const& propertyName);
-		bool wantSell(std::string const& propertyName);
+                virtual bool wantBuy() = 0;
+                virtual bool wantSell() = 0;
 };
 
-class SmartassComputerPlayer : public ComputerPlayer {
+class DumbComputerStrategy : public ComputerStrategy {
 
-	public:
-		SmartassComputerPlayer(std::string _name);
-		std::shared_ptr<ComputerPlayer> create (std::string _name);
-		bool wantBuy(std::string const& propertyName);
-		bool wantSell(std::string const& propertyName);
+        private :
+                int buyOfferCount;
+                int sellOfferCount;
+        public :
+                DumbComputerStrategy();
+                bool wantBuy(); 
+                bool wantSell();
 };
 
-//FACTORY
-class PlayerFactory {
-	public:
-		virtual ~PlayerFactory(){} ;
-		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
-		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
-};
+class SmartassComputerStrategy : public ComputerStrategy {
 
-class ConcretePlayerFactory : public PlayerFactory{
-	private:
-		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
-	public:
-		~ConcretePlayerFactory(){};
-		ConcretePlayerFactory(){};
-		void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype);
-		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
+        public :
+                SmartassComputerStrategy();
+                bool wantBuy(); 
+                bool wantSell();
 };
 
 
