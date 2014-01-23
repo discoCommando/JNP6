@@ -264,10 +264,11 @@ class HumanPlayerPrototype{
 
 // klasa HumanPlayer jest ADAPTEREM.
 // umie odpowiadac na komunkaty klasy MojaGrubaRyba korzystajac z klasy Human;
-class HumanPlayer: public Player, public HumanPlayerPrototype{
+class HumanPlayer: public Player, public HumanPlayerPrototype {
 public:
         HumanPlayer (std::string _name, std::shared_ptr<Human> _h ); //: human(h){};
-		std::shared_ptr<HumanPlayer> create(std::string _name, std::shared_ptr<Human> _h);
+
+	std::shared_ptr<HumanPlayer> create(std::string _name, std::shared_ptr<Human> _h);
 	
         bool wantBuy(std::string const& propertyName);
 
