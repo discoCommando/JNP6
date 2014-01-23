@@ -1,12 +1,12 @@
 #include <iostream>
 #include <memory>
 #include "mojagrubaryba.h"
-
 int main()
 {
-	 std::shared_ptr<MojaGrubaRyba> mgr = std::shared_ptr<MojaGrubaRyba>(new MojaGrubaRyba());
    
 	std::shared_ptr<PlayerFactory> f = std::shared_ptr<PlayerFactory>(new ConcretePlayerFactory() ); 
-	//std::shared_ptr<ConcretePlayerFactory> d = std::shared_ptr<ConcretePlayerFactory>(new ConcretePlayerFactory() ); 
+	f->registerComputerPlayer(GrubaRyba::ComputerLevel::DUMB, std::shared_ptr<ComputerPlayer>(new DumbComputerPlayer("prototype")));
+	std::shared_ptr<ComputerPlayer> p = f->createComputerPlayer(GrubaRyba::ComputerLevel::DUMB, "gracz1");
+
 	return 0;
 }

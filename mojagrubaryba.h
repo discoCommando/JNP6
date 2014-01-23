@@ -281,9 +281,11 @@ public:
 	//TODO rostrzygnac czy potrzebne.
         //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
 	
+
 	
+	virtual std::shared_ptr<ComputerPlayer> create(std::string _name) = 0;
 	ComputerPlayer(std::string _name) : Player(_name){}
-	std::shared_ptr<ComputerPlayer> create(std::string _name);
+	//std::shared_ptr<ComputerPlayer> create(std::string _name);
 private:
 	//GrubaRyba::ComputerLevel myLevel;
 };

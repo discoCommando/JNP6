@@ -363,13 +363,17 @@ bool SmartassComputerPlayer::wantSell(std::string const& propertyName){
 
 //FACTORY;
 
-std::shared_ptr< ComputerPlayer > ConcretePlayerFactory::createComputerPlayer(ComputerLvl lvl, std::string name)
-{
-		if (lvl == ComputerLvl::DUMB) 
-			return std::shared_ptr< ComputerPlayer >(new DumbComputerPlayer(name));
-		else
-			return std::shared_ptr< ComputerPlayer >(new SmartassComputerPlayer(name));
-			
+//std::shared_ptr< ComputerPlayer > ConcretePlayerFactory::createComputerPlayer(ComputerLvl lvl, std::string name)
+//{
+//		if (lvl == ComputerLvl::DUMB) 
+//			return std::shared_ptr< ComputerPlayer >(new DumbComputerPlayer(name));
+//		else
+//			return std::shared_ptr< ComputerPlayer >(new SmartassComputerPlayer(name));
+//			
+//}
+
+std::shared_ptr< ComputerPlayer > ConcretePlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel lvl, std::string name){
+	return computerPlayerMap.at(lvl)->create(name);
 }
 
 void ConcretePlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, std::shared_ptr<ComputerPlayer> p ){
@@ -381,15 +385,12 @@ std::string Player::getName()
 	return this->name;
 }
 
-std::shared_ptr< ComputerPlayer > ComputerPlayer::create(std::string _name)
-{
-
-}
-
-ConcretePlayerFactory::ConcretePlayerFactory()
-{
-	
-}
+//std::shared_ptr< ComputerPlayer > ComputerPlayer::create(std::string _name)
+//{
+//
+//}
+//
+ConcretePlayerFactory::ConcretePlayerFactory(){}
 
 
 void MojaGrubaRyba::addComputerPlayer(GrubaRyba::ComputerLevel level)
