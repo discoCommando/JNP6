@@ -3,10 +3,12 @@
 
 #include<vector>
 #include<string>
+#include<cstring>
 #include<memory>
 #include<map>
 #include<exception>
 #include<tuple>
+#include<iostream>
 #include"grubaryba.h"
 
 typedef GrubaRyba::ComputerLevel ComputerLvl;
@@ -74,6 +76,10 @@ private:
         void makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         void bankruptPlayer(std::shared_ptr<Player> p);
 		std::shared_ptr<Die> defaultDie;
+		void addPlayer(std::shared_ptr<Player> p);
+		std::map<std::shared_ptr<Player>, bool> bankruptPlayers;
+		int playingPlayers;
+		int roundNo;
 };
 
 
@@ -101,11 +107,12 @@ public:
         //puste funkcje (nic nie robią)
         Field(const std::string& _name):
                                 name(_name){}
-        void stepOn(std::shared_ptr<Player> p);
-        void goThrough(std::shared_ptr<Player> p);
-        bool permissionToMove(std::shared_ptr<Player> p);
-        void endOfRound();
+        virtual void stepOn(std::shared_ptr<Player> p);
+        virtual void goThrough(std::shared_ptr<Player> p);
+        virtual bool permissionToMove(std::shared_ptr<Player> p);
+        virtual void endOfRound();
         std::string getName();
+		virtual void writeStatus(std::shared_ptr<Player> p);
                 
 protected:
         const std::string name;
@@ -167,6 +174,7 @@ public:
         void stepOn(std::shared_ptr<Player> p);
         bool permissionToMove(std::shared_ptr<Player> p);
         void endOfRound();
+		void writeStatus(std::shared_ptr<Player> p);
 private:
         int waitTime;
         std::map<std::shared_ptr<Player>, int> waitingPlayers;

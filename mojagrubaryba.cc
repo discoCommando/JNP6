@@ -5,10 +5,13 @@ MojaGrubaRyba::MojaGrubaRyba() : factory(),
 					std::shared_ptr<HumanPlayer>(
 						new HumanPlayer("prototype", 
 						std::shared_ptr<Human>(new HumanPlaceHolder())))),
-				std::shared_ptr<MGRBoard> (new MGRBoard()){
+				std::shared_ptr<MGRBoard> (new MGRBoard()),
+					playingPlayers(0),
+					roundNo(0){
 
 	factory->registerComputerPlayer(GrubaRyba::ComputerLevel::DUMB, std::shared_ptr<ComputerPlayer>(new DumbComputerPlayer("prototype")));
 	factory->registerComputerPlayer(GrubaRyba::ComputerLevel::SMARTASS, std::shared_ptr<ComputerPlayer>(new SmartassComputerPlayer("prototype")));
+	
 }
 
 
@@ -22,21 +25,22 @@ void MojaGrubaRyba::play(unsigned int rounds)
 				}
 		}catch(EndOfGameException& e)
 		{
-			
+				roundNo = 0;
 		}
 }
 
 void MojaGrubaRyba::makeRound() throw(EndOfGameException)
 {
-		for(auto it = Players.begin(); it != Players.end(); )
+		roundNo++;
+		printf("Runda: %i\n", roundNo);
+		for(auto it = Players.begin(); it != Players.end(); it++)
 		{
 			try
 			{
-					if(Players.size() > 1)
+					if(playingPlayers > 1)
 					{
 							makeMove(*it);
-							it++;
-						
+
 					}else
 					{
 						throw EndOfGameException();
@@ -45,7 +49,7 @@ void MojaGrubaRyba::makeRound() throw(EndOfGameException)
 			catch(PlayerBankruptException& e)
 			{
 					bankruptPlayer(*it);
-					it = Players.erase(it);
+					
 			}
 		}
 }
@@ -53,19 +57,26 @@ void MojaGrubaRyba::makeRound() throw(EndOfGameException)
 
 void MojaGrubaRyba::makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException)
 {
-		if(this->myBoard->getField(p->getPos())->permissionToMove(p))
-		{
-				int roll = this->defaultDie->roll() + this->defaultDie->roll();
-				int pos = p->getPos();
-				for(int i = 0; i < roll - 1; i++)
+		if(!this->bankruptPlayers[p]){
+				if(this->myBoard->getField(p->getPos())->permissionToMove(p))
 				{
-					pos = (pos + 1)%this->myBoard->sizeOfBoard();
-					this->myBoard->getField(pos)->goThrough(p);
+						int roll = this->defaultDie->roll() + this->defaultDie->roll();
+						int pos = p->getPos();
+						for(int i = 0; i < roll - 1; i++)
+						{
+							pos = (pos + 1)%this->myBoard->sizeOfBoard();
+							this->myBoard->getField(pos)->goThrough(p);
+						}
+						
+						pos = (pos + 1)%this->myBoard->sizeOfBoard();	
+						this->myBoard->getField(pos)->stepOn(p);
+						
 				}
-				
-				pos = (pos + 1)%this->myBoard->sizeOfBoard();	
-				this->myBoard->getField(pos)->stepOn(p);
-				
+				this->myBoard->getField(p->getPos())->writeStatus(p);
+		}
+		else
+		{
+				std::cout <<p->getName()<<" *** bankrut ***\n";
 		}
 }
 
@@ -81,7 +92,8 @@ void MojaGrubaRyba::bankruptPlayer(std::shared_ptr< Player > p)
 					throw dupa;
 				}
 		}
-		it = Players.erase(it);
+		playingPlayers--;
+		this->bankruptPlayers[*it] = true;
 		
 }
 
@@ -147,6 +159,10 @@ std::string Field::getName()
         return this->name;
 }
 
+void Field::writeStatus(std::shared_ptr< Player > p)
+{
+	std::cout <<p->getName()<<" pole: "<<this->getName()<<" gotowka: "<<p->getCash()<<"\n";
+}
 
 
 void Start::stepOn(std::shared_ptr<Player> p)
@@ -208,6 +224,12 @@ void Aquarium::endOfRound()
                 it->second--;
         }
 }
+
+void Aquarium::writeStatus(std::shared_ptr< Player > p)
+{
+		std::cout <<p->getName()<<" pole: "<<this->getName()<<" *** czekanie: "<<this->waitingPlayers[p]<<" ***\n";
+}
+
 
 void Property::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
@@ -341,7 +363,7 @@ std::string const& ComputerPlayer::getName(){
 
 
 //DUMBCOMPUTERPLAYER;
-DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){};
+DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){}
 
 std::shared_ptr<ComputerPlayer> DumbComputerPlayer::create(std::string _name){
 	return std::shared_ptr<ComputerPlayer>(new DumbComputerPlayer(_name));
@@ -355,7 +377,7 @@ bool DumbComputerPlayer::wantSell(std::string const& propertyName){
 }
 
 //SMARTASSCOMPUTERPLAYER
-SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){};
+SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){}
 
 std::shared_ptr<ComputerPlayer> SmartassComputerPlayer::create(std::string _name){
 	return std::shared_ptr<ComputerPlayer>(new SmartassComputerPlayer(_name));
@@ -401,13 +423,14 @@ ConcretePlayerFactory::ConcretePlayerFactory(){}
 
 void MojaGrubaRyba::addComputerPlayer(GrubaRyba::ComputerLevel level)
 {
-	Players.push_back(factory->createComputerPlayer(level, "gracz"+std::to_string(Players.size())));
-
+	
+	Players.push_back(factory->createComputerPlayer(level, "gracz"+ std::to_string(Players.size())));
+	addPlayer(Players[Players.size() - 1]);
 }
 void MojaGrubaRyba::addHumanPlayer(std::shared_ptr< Human > human)
 {
 	Players.push_back(humanPlayerPrototype->create(human->getName(),human));
-
+	addPlayer(Players[Players.size() - 1]);
 }
 MojaGrubaRyba::MojaGrubaRyba(std::shared_ptr< PlayerFactory > _factory, std::shared_ptr< HumanPlayerPrototype > _humanPlayerPrototype)
 {
@@ -415,7 +438,13 @@ MojaGrubaRyba::MojaGrubaRyba(std::shared_ptr< PlayerFactory > _factory, std::sha
 }
 void MojaGrubaRyba::setDie(std::shared_ptr< Die > die)
 {
+		this->defaultDie = die;
+}
 
+void MojaGrubaRyba::addPlayer(std::shared_ptr< Player > p)
+{
+		bankruptPlayers.insert(std::pair<std::shared_ptr< Player >, bool >(p,false));
+		playingPlayers++;
 }
 
 
