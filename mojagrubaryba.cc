@@ -392,5 +392,25 @@ ConcretePlayerFactory::ConcretePlayerFactory()
 }
 
 
+ConcretePlayerFactory::~ConcretePlayerFactory()
+{
+
+}
+void MojaGrubaRyba::addComputerPlayer(GrubaRyba::ComputerLevel level)
+{
+
+}
+void MojaGrubaRyba::addHumanPlayer(std::shared_ptr< Human > human)
+{
+
+}
+MojaGrubaRyba::MojaGrubaRyba(std::shared_ptr< PlayerFactory > _factory, std::shared_ptr< HumanPlayerPrototype > _humanPlayerPrototype)
+{
+
+}
+void MojaGrubaRyba::setDie(std::shared_ptr< Die > die)
+{
+
+}
 
 
