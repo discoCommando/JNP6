@@ -8,19 +8,32 @@ MojaGrubaRyba::MojaGrubaRyba()
 void MojaGrubaRyba::play(unsigned int rounds)
 {
 		unsigned int counter = 0;
-		while((++counter <= rounds) && (this->Players.size() > 1))
+		try{
+				while((++counter <= rounds))
+				{
+					makeRound();
+				}
+		}catch(EndOfGameException& e)
 		{
-			makeRound();
+			
 		}
 }
 
-void MojaGrubaRyba::makeRound()
+void MojaGrubaRyba::makeRound() throw(EndOfGameException)
 {
-		for(auto it = Players.begin(); it != Players.end(); it++)
+		for(auto it = Players.begin(); it != Players.end(); )
 		{
 			try
 			{
-					makeMove(*it);
+					if(Players.size() > 1)
+					{
+							makeMove(*it);
+							it++;
+						
+					}else
+					{
+						throw EndOfGameException();
+					}
 			}
 			catch(PlayerBankruptException& e)
 			{
@@ -48,7 +61,24 @@ void MojaGrubaRyba::makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptExce
 				
 		}
 }
-        
+
+void MojaGrubaRyba::bankruptPlayer(std::shared_ptr< Player > p)
+{
+		auto it = Players.begin();
+		while (*it != p)
+		{
+				it++;
+				if (it == Players.end())
+				{
+					int dupa = 666;
+					throw dupa;
+				}
+		}
+		it = Players.erase(it);
+		
+}
+
+       
 void Board::addField(std::shared_ptr<Field> newField)
 {
         Fields.push_back(newField);
@@ -140,9 +170,9 @@ void Punishment::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptExcepti
 void Deposit::goThrough(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO to samo co wyzej
-        int cashGiven = 0;
-        cash += p->giveCash(this->payPrice);
-		if(cashGiven < payPrice) throw PlayerBankruptException();
+        auto pair = p->giveCash(this->payPrice);
+        
+		if(pair.second) throw PlayerBankruptException();
 }
 void Deposit::stepOn(std::shared_ptr< Player > p)
 {
@@ -175,9 +205,9 @@ void Aquarium::endOfRound()
 void Property::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO WYJATKIIIII
-        int cashGiven = 0;
-        this->Owner->takeCash(cashGiven = p->giveCash(this->priceOfStay));
-		if(cashGiven < priceOfStay) throw PlayerBankruptException();
+        auto pair =  p->giveCash(this->priceOfStay);
+        this->Owner->takeCash(pair.first);
+		if(pair.second) throw PlayerBankruptException();
 }
 
 bool Property::noOwner()
@@ -209,8 +239,9 @@ int Player::getCash()
         return this->cash;
 }
 
-int Player::giveCash(int _cash)
+std::pair<int, bool> Player::giveCash(int _cash) 
 {
+		bool bankrupt = false;
         auto it = myProperties.begin();
         while ((this->cash < _cash) && (it != this->myProperties.end()))
         {
@@ -224,5 +255,17 @@ int Player::giveCash(int _cash)
 					it++;
 				}
 		}
-		return cash >= _cash? _cash: cash;
+		if (cash < _cash) //znaczy ze zbankrutowal
+		{
+				bankrupt = true;
+				it = myProperties.begin();
+				while(it != myProperties.end())
+				{
+						cash += (*it)->getPrice()/2;
+						(*it)->getSold();
+				}
+				
+		}
+		cash = cash >= _cash? _cash: cash;
+		return std::make_pair(cash, bankrupt);
 }

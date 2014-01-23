@@ -6,6 +6,7 @@
 #include<memory>
 #include<map>
 #include<exception>
+#include<tuple>
 #include"grubaryba.h"
 
 
@@ -30,10 +31,18 @@ class ComputerPlayer;
 class HumanPlayer;
 class ComputerStrategy;
 class MGRBoard;
+
 class PlayerBankruptException: public std::exception
 {
 	
 };
+
+class EndOfGameException: public std::exception
+{
+	
+};
+
+
 class MojaGrubaRyba //public GrubaRyba
 {
 friend class MGRBoard;
@@ -48,7 +57,7 @@ public:
 private:
         std::vector<std::shared_ptr<Player>> Players;
         std::shared_ptr<MGRBoard> myBoard;
-        void makeRound();
+        void makeRound() throw (EndOfGameException);
         void makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         void bankruptPlayer(std::shared_ptr<Player> p);
 		std::shared_ptr<Die> defaultDie;
@@ -207,7 +216,8 @@ public:
         
         int getPos();
         void takeCash(int _cash);
-        int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
+        std::pair<int, bool> giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
+								//i bool czy zbankrutowal
         int getCash();
         
 protected:
