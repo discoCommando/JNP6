@@ -1,8 +1,14 @@
 #include "mojagrubaryba.h"
 
-MojaGrubaRyba::MojaGrubaRyba()
-{
+MojaGrubaRyba::MojaGrubaRyba() : factory(),
+				humanPlayerPrototype(
+					std::shared_ptr<HumanPlayer>(
+						new HumanPlayer("prototype", 
+						std::shared_ptr<Human>(new HumanPlaceHolder())))),
+				std::shared_ptr<MGRBoard> (new MGRBoard()){
 
+	factory->registerComputerPlayer(GrubaRyba::ComputerLevel::DUMB, std::shared_ptr<ComputerPlayer>(new DumbComputerPlayer("prototype")));
+	factory->registerComputerPlayer(GrubaRyba::ComputerLevel::SMARTASS, std::shared_ptr<ComputerPlayer>(new SmartassComputerPlayer("prototype")));
 }
 
 

@@ -34,6 +34,7 @@ class Board;
 class ComputerPlayer;
 class HumanPlayer;
 class HumanPlayerPrototype;
+class HumanPlaceHolder;
 class PlayerFactory;
 class MGRBoard;
 
@@ -275,6 +276,25 @@ public:
         bool wantSell(std::string const& propertyName);
 private:
 	std::shared_ptr<Human> h;
+};
+
+class HumanPlaceHolder : public Human{
+    std::string const& getName(){
+	    return "placeholder";
+    }
+
+    bool wantBuy(std::string const& propertyName){
+	    return false;
+    }
+
+    bool wantSell(std::string const& propertyName) {
+	    return false;
+    }
+
+    virtual std::shared_ptr<Human> clone(){
+	    return std::shared_ptr<Human>(new HumanPlaceHolder());
+    }
+
 };
 
 class ComputerPlayer: public Player{
