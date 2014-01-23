@@ -224,8 +224,6 @@ void Property::getSold()
 }
 
 
-
->>>>>>> 6953560272eac62509d6f1ce14953155bd1d1156
 int Player::getPos()
 {
         return this->position;
@@ -240,6 +238,8 @@ int Player::getCash()
 {
         return this->cash;
 }
+
+
 
 std::pair<int, bool> Player::giveCash(int _cash) 
 {
@@ -273,16 +273,32 @@ std::pair<int, bool> Player::giveCash(int _cash)
 }
 
 //HUMAN PLAYER; //FIXME
-HumanPlayer::HumanPlayer(Human _h) : h(_h), position(0), cash(1000), myProperties()  {};
+//HumanPlayer::HumanPlayer(Human _h) : h(_h), position(0), cash(1000), myProperties()  {};
 
-shared_ptr<HumanPlayer> HumanPlayer::create(Human _h){
-	return shared_ptr<Human>(_h);
+
+HumanPlayer::HumanPlayer(std::string _name, std::shared_ptr< Human > _h):Player(name),h(_h)
+{
+
 }
+
+
+std::shared_ptr< HumanPlayer > HumanPlayer::create(std::string _name, std::shared_ptr< Human > _h)
+{
+	return std::shared_ptr<HumanPlayer>(new HumanPlayer(_name, h));	
+}
+
+
+// std::shared_ptr<HumanPlayer> HumanPlayer::create(Human& _h)
+// {
+// 	return std::shared_ptr<Human>(_h);
+// }
 //teraz glupie funkcje;
 
+/*
 std::string const& HumanPlayer::getName(){
 	return h->getName();
-}
+}*/
+
 
 bool HumanPlayer::wantBuy(std::string const& propertyName){
 	return h->wantBuy(propertyName);
@@ -292,27 +308,31 @@ bool HumanPlayer::wantSell(std::string const& propertyName){
 	return h->wantSell(propertyName);
 }
 
-shared_ptr<HumanPlayer> HumanPlayer::clone(){
-	return HumanPlayer(*this);
-}
+// std::shared_ptr<HumanPlayer> HumanPlayer::clone(){
+// 	return HumanPlayer(*this);
+// }
 
 
 //COMPUTER PLAYER; //FIXME ZROBIC TO DOBRZE;
-ComputerPlayer::ComputerPlayer(std::string _name) : name(_name), position(0), cash(1000), myProperties() {};
+/*
+ComputerPlayer::ComputerPlayer(std::string _name) : Player(_name), myProperties() {};*/
+/*
+std::shared_ptr<ComputerPlayer> ComputerPlayer::create(std::string _name){
+	return std::shared_ptr<ComputerPlayer>(new ComputerPlayer(_name));
+}*/
 
-shared_ptr<ComputerPlayer> ComputerPlayer::create(std::string _name){
-	return shared_ptr<ComputerPlayer>(new ComputerPlayer(_name));
-}
 
+/*
 std::string const& ComputerPlayer::getName(){
 	return name;
-}
+}*/
+
 
 //DUMBCOMPUTERPLAYER;
 DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){};
 
-shared_ptr<ComputerPlayer> DumbComputerPlayer::create(std::string _name){
-	return shared_ptr<ComputerPlayer>(new DumbComputerPlayer(_name));
+std::shared_ptr<ComputerPlayer> DumbComputerPlayer::create(std::string _name){
+	return std::shared_ptr<ComputerPlayer>(new DumbComputerPlayer(_name));
 }
 //FIXME sprawdzic czy pierwsze kupuje;
 bool DumbComputerPlayer::wantBuy(std::string const& propertyName){
@@ -325,8 +345,8 @@ bool DumbComputerPlayer::wantSell(std::string const& propertyName){
 //SMARTASSCOMPUTERPLAYER
 SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){};
 
-shared_ptr<ComputerPlayer> SmartassComputerPlayer::crete(std::string _name){
-	return shared_ptr<ComputerPlayer>(new SmartassComputerPlayer(_name));
+std::shared_ptr<ComputerPlayer> SmartassComputerPlayer::create(std::string _name){
+	return std::shared_ptr<ComputerPlayer>(new SmartassComputerPlayer(_name));
 }
 bool SmartassComputerPlayer::wantBuy(std::string const& propertyName){
 	return true;
@@ -336,11 +356,35 @@ bool SmartassComputerPlayer::wantSell(std::string const& propertyName){
 }
 
 //FACTORY;
-void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, shared_ptr<ComputerPlayer> p ){
-	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, std::shared_ptr<ComputerPlayer> >(l,p);
+
+std::shared_ptr< ComputerPlayer > ConcretePlayerFactory::createComputerPlayer(ComputerLvl lvl, std::string name)
+{
+		if (lvl == ComputerLvl::DUMB) 
+			return std::shared_ptr< ComputerPlayer >(new DumbComputerPlayer(name));
+		else
+			return std::shared_ptr< ComputerPlayer >(new SmartassComputerPlayer(name));
+			
 }
 
-std::shared_ptr<ComputerPlayer> ConcreteComputerPlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel id, std::string _name){
-	//return computerPlayerMap.at(id).clone();
-	return shared_ptr<ComputerPlayer>(computerPlayerMap.at(id).create(_name);
+void ConcretePlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, std::shared_ptr<ComputerPlayer> p ){
+	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, std::shared_ptr<ComputerPlayer> >(l,p));
 }
+
+std::string Player::getName()
+{
+	return this->name;
+}
+
+std::shared_ptr< ComputerPlayer > ComputerPlayer::create(std::string _name)
+{
+
+}
+
+ConcretePlayerFactory::ConcretePlayerFactory()
+{
+	
+}
+
+
+
+
