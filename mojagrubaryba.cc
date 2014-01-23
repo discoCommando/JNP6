@@ -18,12 +18,18 @@ void MojaGrubaRyba::makeRound()
 {
 		for(int i = 0; i < Players.size(); i++)
 		{
-			makeMove(Players[i]);
+			try{
+				makeMove(Players[i]);
+			}
+			catch(PlayerBankruptException& e)
+			{
+				
+			}
 		}
 }
 
 
-void MojaGrubaRyba::makeMove(std::shared_ptr<Player> p)
+void MojaGrubaRyba::makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException)
 {
 		if(this->myBoard->getField(p->getPos())->permissionToMove(p))
 		{
@@ -96,7 +102,8 @@ void Field::endOfRound()
 {
 
 }
-const std::string& Field::getName()
+
+std::string Field::getName()
 {
         return this->name;
 }
@@ -105,7 +112,7 @@ const std::string& Field::getName()
 
 void Start::stepOn(std::shared_ptr<Player> p)
 {
-        p->giveCash(startPrice);
+        p->takeCash(startPrice);
 }
 void Start::goThrough(std::shared_ptr<Player> p)
 {
@@ -115,25 +122,29 @@ void Start::goThrough(std::shared_ptr<Player> p)
 
 void Reward::stepOn(std::shared_ptr< Player > p)
 {
-        p->giveCash(this->reward);
+        p->takeCash(this->reward);
 }
 
 
-void Punishment::stepOn(std::shared_ptr< Player > p)
+void Punishment::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO rzucic wyjatek jesli p->takeCash(this->punishmentPrice) < punishmentPrice (to znaczy ze zbankrutowal)
-        p->takeCash(this->punishmentPrice);
+        int cashGiven = 0;
+        p->giveCash(this->punishmentPrice);
+		if(cashGiven < punishmentPrice) throw PlayerBankruptException();
 }
 
 
-void Deposit::goThrough(std::shared_ptr< Player > p)
+void Deposit::goThrough(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO to samo co wyzej
+        int cashGiven = 0;
         cash += p->giveCash(this->payPrice);
+		if(cashGiven < payPrice) throw PlayerBankruptException();
 }
 void Deposit::stepOn(std::shared_ptr< Player > p)
 {
-        p->giveCash(this->cash);
+        p->takeCash(this->cash);
         cash = 0;
 }
 
@@ -159,10 +170,12 @@ void Aquarium::endOfRound()
         }
 }
 
-void Property::stepOn(std::shared_ptr< Player > p)
+void Property::stepOn(std::shared_ptr< Player > p) throw(PlayerBankruptException)
 {
         //TODO WYJATKIIIII
-        this->Owner->takeCash(p->giveCash(this->priceOfStay));
+        int cashGiven = 0;
+        this->Owner->takeCash(cashGiven = p->giveCash(this->priceOfStay));
+		if(cashGiven < priceOfStay) throw PlayerBankruptException();
 }
 
 bool Property::noOwner()
@@ -190,9 +203,13 @@ int Player::getCash()
 
 int Player::giveCash(int _cash)
 {
-        auto it = this->myProperties.begin();
-//         while ((this->cash < _cash) && (it != this->myProperties.end()))
-//         {
-//                 if(this->wantSell(it.))
-
+        auto it = myProperties.begin();
+        while ((this->cash < _cash) && (it != this->myProperties.end()))
+        {
+                if(this->wantSell((*it)->getName()))
+				{
+					this->cash += ((*it)->getPrice())/2;
+					//TODO niedokonczone
+				}
+		}
 }

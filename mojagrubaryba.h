@@ -30,7 +30,10 @@ class ComputerPlayer;
 class HumanPlayer;
 class ComputerStrategy;
 class MGRBoard;
-
+class PlayerBankruptException: public std::exception
+{
+	
+};
 class MojaGrubaRyba //public GrubaRyba
 {
 friend class MGRBoard;
@@ -46,7 +49,7 @@ private:
         std::vector<std::shared_ptr<Player>> Players;
         std::shared_ptr<MGRBoard> myBoard;
         void makeRound();
-        void makeMove(std::shared_ptr<Player> p);
+        void makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         void bankruptPlayer(std::shared_ptr<Player> p);
 		std::shared_ptr<Die> defaultDie;
 };
@@ -79,7 +82,7 @@ public:
         void goThrough(std::shared_ptr<Player> p);
         bool permissionToMove(std::shared_ptr<Player> p);
         void endOfRound();
-        const std::string& getName();
+        std::string getName();
                 
 protected:
         const std::string name;
@@ -113,7 +116,7 @@ public:
         Punishment(const std::string& _name, int price):
                 Field(_name),
                 punishmentPrice(price){}
-        void stepOn(std::shared_ptr<Player> p);
+        void stepOn(std::shared_ptr<Player> p) throw(PlayerBankruptException);
 protected:
         int punishmentPrice;
 };
@@ -126,7 +129,7 @@ public:
                 cash(0),
                 payPrice(_payPrice){}
         void stepOn(std::shared_ptr<Player> p);
-        void goThrough(std::shared_ptr<Player> p);
+        void goThrough(std::shared_ptr<Player> p) throw(PlayerBankruptException);
 private:
         int cash;
         int payPrice;
@@ -153,8 +156,10 @@ public:
                 Field(_name),
                 price(_price),
                 priceOfStay(_priceOfStay){}
-        void stepOn(std::shared_ptr<Player> p);
+        void stepOn(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         bool noOwner();
+		int getPrice();
+		void getSold();
 
 protected:
         std::shared_ptr<Player> Owner;
@@ -205,7 +210,7 @@ public:
         int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
         int getCash();
         
-private:
+protected:
         int position;
         int cash;
         std::vector<std::shared_ptr<Property>> myProperties;
@@ -261,9 +266,6 @@ class SmartassComputerStrategy : public ComputerStrategy {
                 bool wantSell();
 };
 
-class PlayerBankruptException: public std::exception
-{
-	
-};
+
 
 #endif
