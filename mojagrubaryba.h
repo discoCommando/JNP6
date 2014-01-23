@@ -7,6 +7,7 @@
 #include<map>
 #include"grubaryba.h"
 
+typedef GrubaRyba::ComputerLevel ComputerLvl;
 
 const int priceOfAnemonia = 160;
 const int priceOfAporina = 220;
@@ -40,6 +41,7 @@ private:
         void makeMove(std::shared_ptr<Player> p);
 	void bankruptPlayer(std::shared_ptr<Player> p);
 };
+
 
 class Board
 {
@@ -175,8 +177,7 @@ private:
 	
 };
 
-class Player
-{
+class Player{
 public:
         
         // Zwraca imię człowieka.
@@ -188,42 +189,68 @@ public:
         // Zwraca true, jeśli człowiek chce sprzedać daną posiadłość.
         // Wywoływane w przypadku, gdy brakuje człowiekowi pieniędzy na zakup lub opłaty.
         virtual bool wantSell(std::string const& propertyName) = 0;
+
+	//ZMIANY PROTOTYPE;
+	//TODO ZASTANOWIC SIE CZY NIE NALEZY TEGO IMPLEMENTOWAC DOPIERO W KOMPUTEROWYM GRACZU;
+	virtual shared_ptr<Player> clone() const = 0;
+	virtual shared_ptr<Player> create() const = 0;
+	virtual ~Player() = 0;
         
-        int getPos();
-	void takeCash(int _cash);
-	int giveCash(int _cash); //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
-	int getCash();
+        int getPos() = 0;
+	void takeCash(int _cash) = 0;
+	int giveCash(int _cash) = 0; //zwraca min(_cash, cash - _cash) czyli tyle na ile go stac
+	//int getCash();
         
 private:
+	std::string name;
+	int number;
+
         int position;
 	int cash;
 	std::vector<std::shared_ptr<Property>> myProperties;
 };
 
-class HumanPlayer: public Player
-{
+
+class HumanPlayer: public Player{
 public:
-        HumanPlayer(Human& h) :
-                human(h){}
-                
+        HumanPlayer(Human& h) 
+		: human(h){};
 private:
         Human& human;
 };
 
-class ComputerPlayer: public Player
-{
+class ComputerPlayer: public Player{
 public:
         ComputerPlayer(GrubaRyba::ComputerLevel level):
-                myLevel(level){}
-        
+                 myLevel(level){}
+
+	shared_ptr<ComputerPlayer> clone();
 private:
         
         GrubaRyba::ComputerLevel myLevel;
-        std::shared_ptr<ComputerStrategy> strategy;
-
 };
 
-// Strategia decyzji kup/ sprzedaj;
+//TODO napisac factory
+//SINGLE RESPONIBILITY.
+class PlayerFactory {
+	public:
+		virtual void registerComputerPlayer( ComputerLvl lvl, shared_ptr<ComputerPlayer> prototype ) = 0;
+		//virtual void registerHumanPlayer(shared_ptr<HumanPlayer> p) = 0;
+		virtual shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
+		virtual shared_ptr<HumanPlayer> createHumanPlayer(std::string name) = 0;
+};
+
+class ConcretePlayerFactory : public PlayerFactory{
+	private:
+		std::map<typename GrubaRyba::ComputerLevel, ComputerPlayer> computerPlayerMap;
+	public:
+		void registerComputerPlayer( ComputerLvl lvl, shared_ptr<ComputerPlayer> prototype);
+		shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
+		shared_ptr<HumanPlayer> createHumanPlayer( std::string name);	
+};
+
+
+/*// Strategia decyzji kup/ sprzedaj;
 class ComputerStrategy {
         public:
                 //TODO ASK: virtualny destruktor??
@@ -250,5 +277,6 @@ class SmartassComputerStrategy : public ComputerStrategy {
                 SmartassComputerStrategy();
                 bool wantBuy(); 
                 bool wantSell();
-};
+};*/
+
 #endif

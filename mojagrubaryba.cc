@@ -155,6 +155,29 @@ int Player::giveCash(int _cash)
 // 	}
 }
 
+shared_ptr<HumanPlayer> HumanPlayer::create(){
+	//TODO sprawdzic domyslny konstruktor;
+	return shared_ptr<HumanPlayer>(new HumanPlayer());
+}
 
+shared_ptr<HumanPlayer> HumanPlayer::clone(){
+	//TODO sprawdzic kopjujacy konstruktor;
+	return shared_ptr<HumanPlayer>(new HumanPlayer(*this));
+}
 
+shared_ptr<ComputerPlayer> ComputerPlayer::create(){
+	return shared_ptr<ComputerPlayer>(new ComputerPlayer());
+}
 
+shared_ptr<ComputerPlayer> ComputerPlayer::clone(){
+	return shared_ptr<ComputerPlayer>(new ComputerPlayer(*this));
+}
+
+//Implementacja Factory;
+void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, ComputerPlayer p ){
+	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, ComputerPlayer>(l,p);
+}
+
+ComputerPlayer ConcreteComputerPlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel id ){
+	return computerPlayerMap.at(id).clone();
+}

@@ -1,7 +1,5 @@
-//
 //  grubaryba_example.cc
 //  grubaryba
-//
 
 #include <iostream>
 #include <memory>
@@ -36,6 +34,7 @@ int main(int argc, const char * argv[]) {
     std::shared_ptr<MojaGrubaRyba> mgr = std::shared_ptr<MojaGrubaRyba>(new MojaGrubaRyba());
     std::shared_ptr<Die> die = std::shared_ptr<Die>(new ExampleDie());
     std::shared_ptr<Human> albin = std::shared_ptr<Human>(new VeryDumbHuman("Albina"));
+
     mgr->setDie(die);
     mgr->addComputerPlayer(GrubaRyba::ComputerLevel::DUMB);
     mgr->addComputerPlayer(GrubaRyba::ComputerLevel::SMARTASS);
