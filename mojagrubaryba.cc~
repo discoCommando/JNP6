@@ -5,6 +5,7 @@ MojaGrubaRyba::MojaGrubaRyba()
 
 }
 
+
 void MojaGrubaRyba::play(unsigned int rounds)
 {
 		unsigned int counter = 0;
@@ -370,7 +371,7 @@ void ConcretePlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, 
 	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, std::shared_ptr<ComputerPlayer> >(l,p));
 }
 
-std::string& Player::getName()
+std::string Player::getName()
 {
 	return this->name;
 }

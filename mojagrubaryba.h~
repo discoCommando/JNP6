@@ -57,7 +57,7 @@ public:
 	MojaGrubaRyba(std::shared_ptr<PlayerFactory> _factory, std::shared_ptr<HumanPlayerPrototype> _humanPlayerPrototype);
 	//TODO zmienic powyzszy konstruktor zeby bral w argumencie liczbe graczy;
 		
-        virtual void setDie(std::shared_ptr<Die> die) = 0;
+        void setDie(std::shared_ptr<Die> die) = 0;
 
 		void addComputerPlayer(GrubaRyba::ComputerLevel level);
 		void addHumanPlayer(std::shared_ptr<Human> human);
@@ -66,10 +66,9 @@ private:
 
         std::vector<std::shared_ptr<Player>> Players;
 
-	std::shared_ptr<PlayerFactory> factory;
-	std::shared_ptr<HumanPlayer> humanPlayerPrototype;
-
-        std::shared_ptr<MGRBoard> myBoard;
+		std::shared_ptr<PlayerFactory> factory;
+		std::shared_ptr<HumanPlayer> humanPlayerPrototype;
+		std::shared_ptr<MGRBoard> myBoard;
         void makeRound() throw (EndOfGameException);
         void makeMove(std::shared_ptr<Player> p) throw(PlayerBankruptException);
         void bankruptPlayer(std::shared_ptr<Player> p);
@@ -230,7 +229,7 @@ public:
 	
 	virtual ~Player() = 0;
         // Zwraca imię człowieka.
-        std::string const& getName();
+        std::string getName();
 
         // Zwraca true, jeśli człowiek chce kupić daną posiadłość.
         virtual bool wantBuy(std::string const& propertyName) = 0;
@@ -313,19 +312,23 @@ class SmartassComputerPlayer : public ComputerPlayer {
 //FACTORY
 class PlayerFactory {
 	public:
-		virtual ~PlayerFactory(){} ;
+		virtual ~PlayerFactory() = 0;
 		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
 		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
 };
 
-class ConcretePlayerFactory : public PlayerFactory{
-	private:
-		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
-	public:
-		~ConcretePlayerFactory();
+class ConcretePlayerFactory : public PlayerFactory
+{
+public:
 		ConcretePlayerFactory();
 		void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype);
 		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
+
+		
+		~ConcretePlayerFactory();	
+private:
+		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
+	
 };
 
 

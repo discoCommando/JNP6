@@ -5,6 +5,7 @@ MojaGrubaRyba::MojaGrubaRyba()
 
 }
 
+
 void MojaGrubaRyba::play(unsigned int rounds)
 {
 		unsigned int counter = 0;
@@ -217,12 +218,17 @@ bool Property::noOwner()
         return false;
 }
 
-//PLAYER
 void Property::getSold()
 {
 		this->Owner.reset();
 }
 
+int Property::getPrice()
+{
+		return this->price;
+}
+
+//PLAYER
 
 int Player::getPos()
 {
