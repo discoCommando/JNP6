@@ -194,8 +194,8 @@ std::string const& ComputerPlayer::getName(){
 //DUMBCOMPUTERPLAYER;
 DumbComputerPlayer::DumbComputerPlayer(std::string _name) : ComputerPlayer(_name){};
 
-shared_ptr<DumbComputerPlayer> DumbComputerPlayer::create(std::string _name){
-	return shared_ptr<DumbComputerPlayer>(new DumbComputerPlayer(_name));
+shared_ptr<ComputerPlayer> DumbComputerPlayer::create(std::string _name){
+	return shared_ptr<ComputerPlayer>(new DumbComputerPlayer(_name));
 }
 //FIXME sprawdzic czy pierwsze kupuje;
 bool DumbComputerPlayer::wantBuy(std::string const& propertyName){
@@ -208,8 +208,8 @@ bool DumbComputerPlayer::wantSell(std::string const& propertyName){
 //SMARTASSCOMPUTERPLAYER
 SmartassComputerPlayer::SmartassComputerPlayer(std::string _name) : ComputerPlayer(_name){};
 
-shared_ptr<SmartassComputerPlayer> SmartassComputerPlayer::crete(std::string _name){
-	return shared_ptr<SmartassComputerPlayer>(new SmartassComputerPlayer(_name));
+shared_ptr<ComputerPlayer> SmartassComputerPlayer::crete(std::string _name){
+	return shared_ptr<ComputerPlayer>(new SmartassComputerPlayer(_name));
 }
 bool SmartassComputerPlayer::wantBuy(std::string const& propertyName){
 	return true;
@@ -219,10 +219,11 @@ bool SmartassComputerPlayer::wantSell(std::string const& propertyName){
 }
 
 //FACTORY;
-void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, ComputerPlayer p ){
-	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, ComputerPlayer>(l,p);
+void ConcreteComputerPlayerFactory::registerComputerPlayer( GrubaRyba::ComputerLevel l, shared_ptr<ComputerPlayer> p ){
+	computerPlayerMap.insert(std::pair<GrubaRyba::ComputerLevel, std::shared_ptr<ComputerPlayer> >(l,p);
 }
 
-ComputerPlayer ConcreteComputerPlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel id ){
-	return computerPlayerMap.at(id).clone();
+std::shared_ptr<ComputerPlayer> ConcreteComputerPlayerFactory::createComputerPlayer( GrubaRyba::ComputerLevel id, std::string _name){
+	//return computerPlayerMap.at(id).clone();
+	return shared_ptr<ComputerPlayer>(computerPlayerMap.at(id).create(_name);
 }

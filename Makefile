@@ -1,3 +1,3 @@
 all:
-	g++ mgrexample.cc -c -o mgrexample -Wall -std=c++11
+	g++ mgrexample.cc -o mgrexample -Wall -std=c++11
 	

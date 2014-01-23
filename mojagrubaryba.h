@@ -231,7 +231,7 @@ private:
 //Przekazujemy obiket nowoutowrzonej klasy w parametrze konstruktora MojejGrubejRyby;
 // UWAGA : implementacja addHumanPlayer(h) uzywa czegos takiego: prototype.create(h);
 class HumanPlayerPrototype{
-	virtual std::shared_ptr<HumanPlayerPrototype> create(std::shared_ptr<Human> _h) = 0;
+	virtual std::shared_ptr<HumanPlayer> create(std::shared_ptr<Human> _h) = 0;
 	//virtual shared_ptr<HumanPlayerPrototype> clone();
 };
 
@@ -265,7 +265,7 @@ class DumbComputerPlayer : public ComputerPlayer {
 		int selOffers;
 	public:
 		DumbComputerPlayer(std::string _name);
-		std::shared_ptr<DumbComputerPlayer> create (std::string _name);
+		std::shared_ptr<ComputerPlayer> create (std::string _name);
 		bool wantBuy(std::string const& propertyName);
 		bool wantSell(std::string const& propertyName);
 };
@@ -274,7 +274,7 @@ class SmartassComputerPlayer : public ComputerPlayer {
 
 	public:
 		SmartassComputerPlayer(std::string _name);
-		std::shared_ptr<DumbComputerPlayer> create (std::string _name);
+		std::shared_ptr<ComputerPlayer> create (std::string _name);
 		bool wantBuy(std::string const& propertyName);
 		bool wantSell(std::string const& propertyName);
 };
@@ -282,14 +282,17 @@ class SmartassComputerPlayer : public ComputerPlayer {
 //FACTORY
 class PlayerFactory {
 	public:
+		virtual ~PlayerFactory(){} ;
 		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
 		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
 };
 
 class ConcretePlayerFactory : public PlayerFactory{
 	private:
-		std::map<typename GrubaRyba::ComputerLevel, ComputerPlayer> computerPlayerMap;
+		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
 	public:
+		~ConcretePlayerFactory(){};
+		ConcretePlayerFactory(){};
 		void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype);
 		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
 };
