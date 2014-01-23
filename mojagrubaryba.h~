@@ -57,7 +57,7 @@ public:
 	MojaGrubaRyba(std::shared_ptr<PlayerFactory> _factory, std::shared_ptr<HumanPlayerPrototype> _humanPlayerPrototype);
 	//TODO zmienic powyzszy konstruktor zeby bral w argumencie liczbe graczy;
 		
-        void setDie(std::shared_ptr<Die> die) = 0;
+        void setDie(std::shared_ptr<Die> die);
 
 		void addComputerPlayer(GrubaRyba::ComputerLevel level);
 		void addHumanPlayer(std::shared_ptr<Human> human);
@@ -282,7 +282,7 @@ public:
         //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
 	
 	
-	ComputerPlayer(std::string _name) : Player(_name){};
+	ComputerPlayer(std::string _name) : Player(_name){}
 	std::shared_ptr<ComputerPlayer> create(std::string _name);
 private:
 	//GrubaRyba::ComputerLevel myLevel;
@@ -312,7 +312,7 @@ class SmartassComputerPlayer : public ComputerPlayer {
 //FACTORY
 class PlayerFactory {
 	public:
-		virtual ~PlayerFactory() = 0;
+		//virtual ~PlayerFactory() = 0;
 		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
 		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
 };
@@ -325,7 +325,7 @@ public:
 		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
 
 		
-		~ConcretePlayerFactory();	
+		//~ConcretePlayerFactory();	
 private:
 		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
 	

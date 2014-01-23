@@ -392,10 +392,6 @@ ConcretePlayerFactory::ConcretePlayerFactory()
 }
 
 
-ConcretePlayerFactory::~ConcretePlayerFactory()
-{
-
-}
 void MojaGrubaRyba::addComputerPlayer(GrubaRyba::ComputerLevel level)
 {
 

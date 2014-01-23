@@ -227,7 +227,7 @@ public:
 	position(_position),
 	cash(_cash){}
 	
-	virtual ~Player() = 0;
+	//virtual ~Player() = 0;
         // Zwraca imię człowieka.
         std::string getName();
 
@@ -282,7 +282,7 @@ public:
         //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
 	
 	
-	ComputerPlayer(std::string _name) : Player(_name){};
+	ComputerPlayer(std::string _name) : Player(_name){}
 	std::shared_ptr<ComputerPlayer> create(std::string _name);
 private:
 	//GrubaRyba::ComputerLevel myLevel;
@@ -312,7 +312,7 @@ class SmartassComputerPlayer : public ComputerPlayer {
 //FACTORY
 class PlayerFactory {
 	public:
-		virtual ~PlayerFactory() = 0;
+		//virtual ~PlayerFactory() = 0;
 		virtual void registerComputerPlayer( ComputerLvl lvl, std::shared_ptr<ComputerPlayer> prototype ) = 0;
 		virtual std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name ) = 0;
 };
@@ -325,7 +325,7 @@ public:
 		std::shared_ptr<ComputerPlayer> createComputerPlayer( ComputerLvl lvl, std::string name );
 
 		
-		~ConcretePlayerFactory();	
+		//~ConcretePlayerFactory();	
 private:
 		std::map<ComputerLvl, std::shared_ptr<ComputerPlayer> > computerPlayerMap;
 	
