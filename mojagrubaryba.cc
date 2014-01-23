@@ -16,14 +16,16 @@ void MojaGrubaRyba::play(unsigned int rounds)
 
 void MojaGrubaRyba::makeRound()
 {
-		for(int i = 0; i < Players.size(); i++)
+		for(auto it = Players.begin(); it != Players.end(); it++)
 		{
-			try{
-				makeMove(Players[i]);
+			try
+			{
+					makeMove(*it);
 			}
 			catch(PlayerBankruptException& e)
 			{
-				
+					bankruptPlayer(*it);
+					it = Players.erase(it);
 			}
 		}
 }
@@ -185,6 +187,12 @@ bool Property::noOwner()
         return false;
 }
 
+void Property::getSold()
+{
+		this->Owner.reset();
+}
+
+
 
 int Player::getPos()
 {
@@ -209,7 +217,12 @@ int Player::giveCash(int _cash)
                 if(this->wantSell((*it)->getName()))
 				{
 					this->cash += ((*it)->getPrice())/2;
-					//TODO niedokonczone
+					(*it)->getSold();
+					it = myProperties.erase(it);//TODO niedokonczone
+				}else
+				{
+					it++;
 				}
 		}
+		return cash >= _cash? _cash: cash;
 }
