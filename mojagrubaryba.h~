@@ -227,7 +227,7 @@ public:
 	position(_position),
 	cash(_cash){}
 	
-	virtual ~Player() = 0;
+	//virtual ~Player() = 0;
         // Zwraca imię człowieka.
         std::string getName();
 
@@ -264,10 +264,11 @@ class HumanPlayerPrototype{
 
 // klasa HumanPlayer jest ADAPTEREM.
 // umie odpowiadac na komunkaty klasy MojaGrubaRyba korzystajac z klasy Human;
-class HumanPlayer: public Player, public HumanPlayerPrototype{
+class HumanPlayer: public Player, public HumanPlayerPrototype {
 public:
         HumanPlayer (std::string _name, std::shared_ptr<Human> _h ); //: human(h){};
-		std::shared_ptr<HumanPlayer> create(std::string _name, std::shared_ptr<Human> _h);
+
+	std::shared_ptr<HumanPlayer> create(std::string _name, std::shared_ptr<Human> _h);
 	
         bool wantBuy(std::string const& propertyName);
 
@@ -281,9 +282,11 @@ public:
 	//TODO rostrzygnac czy potrzebne.
         //ComputerPlayer(GrubaRyba::ComputerLevel level):myLevel(level){}
 	
+
 	
+	virtual std::shared_ptr<ComputerPlayer> create(std::string _name) = 0;
 	ComputerPlayer(std::string _name) : Player(_name){}
-	std::shared_ptr<ComputerPlayer> create(std::string _name);
+	//std::shared_ptr<ComputerPlayer> create(std::string _name);
 private:
 	//GrubaRyba::ComputerLevel myLevel;
 };
