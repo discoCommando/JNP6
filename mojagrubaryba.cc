@@ -5,7 +5,7 @@ MojaGrubaRyba::MojaGrubaRyba() : factory(),
 					std::shared_ptr<HumanPlayer>(
 						new HumanPlayer("prototype", 
 						std::shared_ptr<Human>(new HumanPlaceHolder())))),
-				std::shared_ptr<MGRBoard> (new MGRBoard()),
+				myBoard(std::shared_ptr<MGRBoard> (new MGRBoard())),
 					playingPlayers(0),
 					roundNo(0){
 

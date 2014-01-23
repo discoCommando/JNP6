@@ -287,8 +287,11 @@ private:
 };
 
 class HumanPlaceHolder : public Human{
-    std::string const& getName(){
-	    return "placeholder";
+
+	public:
+	HumanPlaceHolder() : name("placeholder"){};
+    std::string const& getName() const{
+	    return name; 
     }
 
     bool wantBuy(std::string const& propertyName){
@@ -299,10 +302,12 @@ class HumanPlaceHolder : public Human{
 	    return false;
     }
 
-    virtual std::shared_ptr<Human> clone(){
+    virtual std::shared_ptr<Human> clone()const {
 	    return std::shared_ptr<Human>(new HumanPlaceHolder());
     }
 
+	private:
+		const std::string& name;
 };
 
 class ComputerPlayer: public Player{
